@@ -1,0 +1,43 @@
+{
+  "name": "Python (uv)",
+  "image": "ghcr.io/astral-sh/uv:debian",
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2.5.9": {}
+  },
+  "mounts": [
+    {
+      "source": "uv",
+      "target": "/home/vscode/.cache/uv",
+      "type": "volume"
+    },
+    {
+      "target": "${containerWorkspaceFolder}/.venv",
+      "type": "volume"
+    },
+    {
+      "source": "data-${devcontainerId}",
+      "target": "${containerWorkspaceFolder}/data",
+      "type": "volume"
+    },
+    {
+      "source": "output-${devcontainerId}",
+      "target": "${containerWorkspaceFolder}/output",
+      "type": "volume"
+    }
+  ],
+  "containerEnv": {
+    "UV_LINK_MODE": "copy"
+  },
+  "onCreateCommand": "sudo chown -R vscode:vscode /home/vscode/.cache/uv .venv data output",
+  "postCreateCommand": "uv sync --locked && git submodule update --init --depth 1 data/google/fonts",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "astral-sh.ty",
+        "charliermarsh.ruff",
+        "tamasfe.even-better-toml"
+      ]
+    }
+  },
+  "remoteUser": "vscode"
+}

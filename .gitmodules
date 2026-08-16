@@ -1,0 +1,6 @@
+[submodule "data/google/fonts"]
+	path = data/google/fonts
+	url = https://github.com/google/fonts.git
+	branch = main
+	shallow = true
+	ignore = dirty
