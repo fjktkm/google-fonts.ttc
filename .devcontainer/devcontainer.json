@@ -2,7 +2,7 @@
   "name": "Python (uv)",
   "image": "ghcr.io/astral-sh/uv:debian",
   "features": {
-    "ghcr.io/devcontainers/features/common-utils:2.5.9": {}
+    "ghcr.io/devcontainers/features/common-utils:2.7.0": {}
   },
   "mounts": [
     {
@@ -11,6 +11,7 @@
       "type": "volume"
     },
     {
+      "source": "venv-${devcontainerId}",
       "target": "${containerWorkspaceFolder}/.venv",
       "type": "volume"
     },
@@ -35,6 +36,7 @@
       "extensions": [
         "astral-sh.ty",
         "charliermarsh.ruff",
+        "ms-python.vscode-python-envs",
         "tamasfe.even-better-toml"
       ]
     }
