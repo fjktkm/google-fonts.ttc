@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-"""Build one TrueType Collection containing all distributable Google Fonts."""
-
 import os
 import tempfile
 from pathlib import Path
@@ -18,7 +16,6 @@ GPOS = int.from_bytes(b"GPOS", "big")
 
 
 def discover_fonts() -> list[Path]:
-    """Return only top-level binaries from each distributable family directory."""
     return sorted(
         (
             path
@@ -33,7 +30,6 @@ def discover_fonts() -> list[Path]:
 
 
 def windows_unique_id(font: TTFont) -> str:
-    """Build a conventional Windows unique ID from existing font metadata."""
     names = font["name"]
     version = names.getName(5, 3, 1, 0x0409).toUnicode()
     version = version.removeprefix("Version ").split(";", 1)[0]
@@ -43,7 +39,6 @@ def windows_unique_id(font: TTFont) -> str:
 
 
 def repair_windows_names(font: TTFont) -> str | None:
-    """Add the Windows Name ID 3 required by GDI when it is absent."""
     names = font["name"]
     if names.getName(3, 3, 1, 0x0409) or names.getName(3, 3, 10, 0x0409):
         return None
@@ -53,18 +48,15 @@ def repair_windows_names(font: TTFont) -> str | None:
 
 
 def optimize_with_harfbuzz(path: Path) -> bytes:
-    """Subset all glyphs with HarfBuzz's default policy and safe optimizations."""
     face = hb.Face(hb.Blob.from_file_path(path))
     subset_input = hb.SubsetInput()
     subset_input.unicode_set.add_range(0, 0x10FFFF)
     subset_input.glyph_set.add_range(0, face.glyph_count - 1)
     subset_input.flags |= hb.SubsetFlags.NO_HINTING | hb.SubsetFlags.OPTIMIZE_IUP_DELTAS
 
-    # HarfBuzz cannot subset SVG, but dropping color outlines is too destructive.
     subset_input.drop_table_tag_set.discard(SVG)
     subset_input.no_subset_table_tag_set.add(SVG)
 
-    # Match fontTools' default: retain legacy kern only when GPOS cannot replace it.
     if GPOS not in face.table_tags:
         subset_input.drop_table_tag_set.discard(KERN)
         subset_input.no_subset_table_tag_set.add(KERN)
@@ -73,7 +65,6 @@ def optimize_with_harfbuzz(path: Path) -> bytes:
 
 
 def build_collection(font_paths: list[Path]) -> int:
-    """Normalize every font uniformly, repair Windows names, and build a TTC."""
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     temporary = OUTPUT.with_suffix(OUTPUT.suffix + ".tmp")
     repair_count = 0
