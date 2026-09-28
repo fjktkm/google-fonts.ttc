@@ -6,8 +6,7 @@ from pathlib import Path
 import uharfbuzz as hb
 from fontTools.ttLib import TTCollection, TTFont
 
-FONT_SUFFIXES = {".otf", ".ttf"}
-FAMILY_ROOTS = ("apache", "ofl", "ufl")
+FONT_PATTERNS = ("apache/*/*.ttf", "ofl/*/*.ttf", "ufl/*/*.ttf")
 FONT_ROOT = Path("data/google/fonts")
 OUTPUT = Path("output/google-fonts.ttc")
 SVG = int.from_bytes(b"SVG ", "big")
@@ -16,17 +15,7 @@ GPOS = int.from_bytes(b"GPOS", "big")
 
 
 def discover_fonts() -> list[Path]:
-    return sorted(
-        (
-            path
-            for family_root in FAMILY_ROOTS
-            for family in (FONT_ROOT / family_root).iterdir()
-            if family.is_dir()
-            for path in family.iterdir()
-            if path.is_file() and path.suffix.lower() in FONT_SUFFIXES
-        ),
-        key=lambda path: path.as_posix(),
-    )
+    return sorted(path for pattern in FONT_PATTERNS for path in FONT_ROOT.glob(pattern))
 
 
 def windows_unique_id(font: TTFont) -> str:
